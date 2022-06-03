@@ -121,7 +121,7 @@ telemetry_colors = {
     'Brake': 'red',
 }
 
-fig, ax = plt.subplots(2)
+fig, ax = plt.subplots(3)
 
 ##############################
 #
@@ -137,7 +137,22 @@ ax[0].plot(ver_telemetry['Distance'], ver_telemetry['Speed'], label=ver_actions[
 ax[0].text(distance_min + 15, 200, speed_text, fontsize=15)
 
 ax[0].set(ylabel='Speed')
-ax[0].legend(loc="lower right")
+#ax[0].legend((line1, line2), ('LEC', 'VER'), loc="lower right")
+
+##############################
+#
+# Lineplot for Gear
+#
+##############################
+ax[2].plot(lec_telemetry['Distance'], lec_telemetry['nGear'], label=lec_actions['Driver'],
+           color=fastf1.plotting.team_color('Ferrari'))
+ax[2].plot(ver_telemetry['Distance'], ver_telemetry['nGear'], label=ver_actions['Driver'],
+           color=fastf1.plotting.team_color('Red Bull'))
+
+# Speed difference
+#ax[2].text('Gear', fontsize=15)
+
+ax[2].set(ylabel='Gear')
 
 ##############################
 #
@@ -182,6 +197,7 @@ ax[1].legend(handles, labels)
 # Zoom in on the specific part we want to see
 ax[0].set_xlim(distance_min, distance_max)
 ax[1].set_xlim(distance_min, distance_max)
+ax[2].set_xlim(distance_min, distance_max)
 
 # Save the plot
 plt.show()
