@@ -9,11 +9,11 @@ import pandas as pd
 ff1.Cache.enable_cache('/tmp/fastf1')  # replace with your cache directory
 ff1.plotting.setup_mpl()
 
-year = 2021
-race = 'Monaco'
+year = 2022
+race = 'Imola'
 session = 'FP2'
 d1 = 'LEC'
-d2 = 'HAM'
+d2 = 'VER'
 
 quali = ff1.get_session(int(year), race, session)
 laps = quali.load_laps(with_telemetry=True)
@@ -49,98 +49,45 @@ df2['min'] = df2.iloc[argrelextrema(df2.Speed.values, np.less_equal, order=n)[0]
 df2['max'] = df2.iloc[argrelextrema(df2.Speed.values, np.greater_equal, order=n)[0]]['Speed']
 
 #droppo i dati che si ripetono
-df1_list= df1['max'].to_list()
-df2_list= df2['max'].to_list()
+df1_list = df1['max'].size
+df2_list = df2['max'].size
 
 #primo dataframe range di un intorno di 2 valori con 'buco'
 #vel max
+df1_max_dup = df1["max"].drop_duplicates()
 
-#This code is used to keep only 1 value within the interval of max 4 repetition
-for i in df1.index:
-    if 0 <= i-4 < len(df1_list):
-        if df1['max'][i] == df1['max'][i-4]:
-            df1['max'][i-4] = np.nan
+speed = {"max", "min"}
+for speed_idx in speed:
+    ref_val = 0
+    idx_to_reset = 0
+    for i in df1.index:
+        val = str(df1[speed_idx][i])
+        if val != "nan":
+            if ref_val == 0:
+                ref_val = df1[speed_idx][i]
+                idx_to_reset = i
+            elif df1[speed_idx][i] == ref_val and i == (idx_to_reset +1):
+                    df1[speed_idx][idx_to_reset] = np.nan
+                    idx_to_reset = i
+        else:
+            ref_val = 0
+            idx_to_reset = 0
 
-for i in df1.index:
-    if 0 <= i-3 < len(df1_list):
-        if df1['max'][i] == df1['max'][i-3]:
-            df1['max'][i-3] = np.nan
+    ref_val = 0
+    idx_to_reset = 0
+    for i in df2.index:
+        val = str(df2[speed_idx][i])
+        if val != "nan":
+            if ref_val == 0:
+                ref_val = df2[speed_idx][i]
+                idx_to_reset = i
+            elif df2[speed_idx][i] == ref_val and i == (idx_to_reset +1):
+                    df2[speed_idx][idx_to_reset] = np.nan
+                    idx_to_reset = i
+        else:
+            ref_val = 0
+            idx_to_reset = 0
 
-for i in df1.index:
-    if 0 <= i-2 < len(df1_list):
-        if df1['max'][i] == df1['max'][i-2]:
-            df1['max'][i-2] = np.nan
-
-for i in df1.index:
-    if 0 <= i-1 < len(df1_list):
-        if df1['max'][i] == df1['max'][i-1]:
-            df1['max'][i-1] = np.nan
-
-#vel min
-
-for i in df1.index:
-    if 0 <= i-4 < len(df1_list):
-        if df1['min'][i] == df1['min'][i-4]:
-            df1['min'][i-4] = np.nan
-
-for i in df1.index:
-    if 0 <= i-3 < len(df1_list):
-        if df1['min'][i] == df1['min'][i-3]:
-            df1['min'][i-3] = np.nan
-
-for i in df1.index:
-    if 0 <= i-2 < len(df1_list):
-        if df1['min'][i] == df1['min'][i-2]:
-            df1['min'][i-2] = np.nan
-
-for i in df1.index:
-    if 0 <= i-1 < len(df1_list):
-        if df1['min'][i] == df1['min'][i-1]:
-            df1['min'][i-1] = np.nan
-
-#secondo dataframe range di un intorno di 2 valori con 'buco'
-#vel max
-for i in df2.index:
-    if 0 <= i-4 < len(df2_list):
-        if df2['max'][i] == df2['max'][i-4]:
-            df2['max'][i-4] = np.nan
-
-for i in df2.index:
-    if 0 <= i-3 < len(df2_list):
-        if df2['max'][i] == df2['max'][i-3]:
-            df2['max'][i-3] = np.nan
-
-for i in df2.index:
-    if 0 <= i-2 < len(df2_list):
-        if df2['max'][i] == df2['max'][i-2]:
-            df2['max'][i-2] = np.nan
-
-for i in df2.index:
-    if 0 <= i-1 < len(df2_list):
-        if df2['max'][i] == df2['max'][i-1]:
-            df2['max'][i-1] = np.nan
-
-#vel min
-
-for i in df2.index:
-    if 0 <= i-4 < len(df1_list):
-        if df2['min'][i] == df2['min'][i-4]:
-            df2['min'][i-4] = np.nan
-
-for i in df2.index:
-    if 0 <= i-3 < len(df1_list):
-        if df2['min'][i] == df2['min'][i-3]:
-            df2['min'][i-3] = np.nan
-
-for i in df2.index:
-    if 0 <= i-2 < len(df1_list):
-        if df2['min'][i] == df2['min'][i-2]:
-            df2['min'][i-2] = np.nan
-
-for i in df2.index:
-    if 0 <= i-1 < len(df1_list):
-        if df2['min'][i] == df2['min'][i-1]:
-            df2['min'][i-1] = np.nan
 
 plt.ioff()
 fig, ax = plt.subplots(1)
@@ -196,7 +143,7 @@ for x, y in zip(distance_list_com, df2_list_min):
 
 #Inserisco il tempo sul giro dei piloti
 
-ax.legend(loc = 'lower left', bbox_to_anchor = (0,1.02,1,0.2),
+ax.legend(loc = 'lower left', bbox_to_anchor = (0, 1.02, 1, 0.2),
 fancybox = True, shadow = True, ncol = 5)
 
 plt.show()
