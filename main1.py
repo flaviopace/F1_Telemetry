@@ -10,8 +10,8 @@ ff1.Cache.enable_cache('/tmp/fastf1')  # replace with your cache directory
 ff1.plotting.setup_mpl()
 
 year = 2022
-race = 'Imola'
-session = 'FP2'
+race = 'France'
+session = 'Q'
 d1 = 'LEC'
 d2 = 'VER'
 
@@ -20,6 +20,9 @@ laps = quali.load_laps(with_telemetry=True)
 
 d1_lap = laps.pick_driver(d1).pick_fastest()
 d2_lap = laps.pick_driver(d2).pick_fastest()
+
+d1_color = ff1.plotting.team_color(laps.pick_driver(d1).pick_fastest().Team)
+d2_color = ff1.plotting.team_color(laps.pick_driver(d2).pick_fastest().Team)
 
 d1_lap_time = d1_lap['LapTime'].total_seconds()
 d2_lap_time = d2_lap['LapTime'].total_seconds()
@@ -93,9 +96,9 @@ plt.ioff()
 fig, ax = plt.subplots(1)
 
 ax.plot(ref_tel['Distance'], ref_tel['Speed'],
-color='red', label=d1)
+color=d1_color, label=d1)
 ax.plot(compare_tel['Distance'], compare_tel['Speed'],
-color='green', label=d2)
+color=d2_color, label=d2)
 
 plt.scatter(ref_tel['Distance'], df1['min'], c='r')
 plt.scatter(ref_tel['Distance'], df1['max'], c='r')
@@ -128,22 +131,31 @@ for x, y in zip(distance_list_ref, df1_list_max):
     textcoords="offset points", # how to position the text
     xytext=(-23, 10), # distance from text to points (x,y)
     ha='center', # horizontal alignment can be left, right or center
-    color='red') # setting the color of the annotation
+    color=d1_color) # setting the color of the annotation
+
 for x, y in zip(distance_list_ref, df1_list_min):
     label = "{:.2f}".format(y)
-    ax.annotate(label, (x, y), textcoords="offset points", xytext=(-23, -10), ha='center', color='red')
+    ax.annotate(label, (x, y), textcoords="offset points", xytext=(-23, -10), ha='center', color=d1_color, rotation=-45)
+    if not np.isnan(y):
+        ax.annotate("Km/h", (x, y), textcoords="offset points", xytext=(1, -27), ha='center', color=d1_color, rotation=-45)
 
 for x, y in zip(distance_list_com, df2_list_max):
     label = "{:.2f}".format(y)
-    ax.annotate(label, (x, y), textcoords="offset points", xytext=(23, 10), ha='center', color='green')
+    ax.annotate(label, (x, y), textcoords="offset points", xytext=(23, 10), ha='center', color=d2_color)
 
 for x, y in zip(distance_list_com, df2_list_min):
     label = "{:.2f}".format(y)
-    ax.annotate(label, (x, y), textcoords="offset points", xytext=(23, -10), ha='center', color='green')
+    ax.annotate(label, (x, y), textcoords="offset points", xytext=(23, -10), ha='center', color=d2_color)
+    if not np.isnan(y):
+        ax.annotate("Km/h", (x, y), textcoords="offset points", xytext=(55, -10), ha='center', color=d2_color)
+
+ax.annotate('FLAVIO', (3000, 175), ha='center', color='white', alpha=0.09, fontsize=70)
 
 #Inserisco il tempo sul giro dei piloti
 
 ax.legend(loc = 'lower left', bbox_to_anchor = (0, 1.02, 1, 0.2),
 fancybox = True, shadow = True, ncol = 5)
+
+
 
 plt.show()

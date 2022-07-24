@@ -7,7 +7,7 @@ fastf1.Cache.enable_cache('/tmp/fastf1')  # replace with your cache directory
 # we only want support for timedelta plotting in this example
 fastf1.plotting.setup_mpl(mpl_timedelta_support=True, color_scheme=None, misc_mpl_mods=False)
 
-session = fastf1.get_session(2022, 'Imola', 'Q')
+session = fastf1.get_session(2022, 'France', 'Q')
 session.load()
 
 # Get the laps
